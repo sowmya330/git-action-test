@@ -3,4 +3,4 @@ logging:
     com:
       cardinalhealth: INFO
     reactor:
-      netty: INFO
+      netty: DEBUG
