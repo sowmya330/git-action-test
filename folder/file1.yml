@@ -1,0 +1,6 @@
+logging:
+  level:
+    com:
+      cardinalhealth: INFO
+    reactor:
+      netty: INFO
