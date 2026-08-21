@@ -1,6 +1,6 @@
 logging:
   level:
     com:
-      cardinalhealth: INFO
+      cardinalhealth: TRACE
     reactor:
-      netty: DEBUG
+      netty: ERROR
