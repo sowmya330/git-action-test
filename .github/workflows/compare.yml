@@ -3,7 +3,7 @@ name: Compare PR Changes
 on:
   pull_request:
     branches:
-      - main # Change this to your default/target branch
+      - main
 
 jobs:
   compare-files:
@@ -13,17 +13,40 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetches all history so you can compare branches
+          fetch-depth: 0
 
-      - name: Fetch target branch
-        run: git fetch origin master # Change 'master' to the branch you want to compare against
-
-      - name: Compare file contents
+      - name: Fetch and checkout master branch snapshot
         run: |
-          echo "=== Showing differences against master branch ==="
-          
-          # Option 1: View the exact code diff for a specific file or folder
-          git diff origin/master...HEAD -- folder/file1.yml
+          git fetch origin master
+          git worktree add ../master-branch origin/master
 
-          # Option 2: List only the names of files that are different
-          git diff --name-status origin/master...HEAD
+      - name: Compare PR files against master
+        run: |
+          echo "=== Showing file-level differences against master ==="
+
+          changed_files=$(git diff --name-only --diff-filter=ACMR origin/master...HEAD)
+
+          if [[ -z "$changed_files" ]]; then
+            echo "No file-level changes found between this PR and master."
+            exit 0
+          fi
+
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+
+            echo "Comparing $file"
+
+            if [[ -f "../master-branch/$file" && -f "$file" ]]; then
+              diff -u "../master-branch/$file" "$file" || true
+            elif [[ -f "$file" ]]; then
+              echo "$file exists only in the PR branch."
+            else
+              echo "$file exists only in master."
+            fi
+
+            echo
+          done <<< "$changed_files"
+
+      - name: Clean up master worktree
+        if: always()
+        run: git worktree remove ../master-branch --force
