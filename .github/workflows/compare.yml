@@ -1,0 +1,29 @@
+name: Compare PR Changes
+
+on:
+  pull_request:
+    branches:
+      - main # Change this to your default/target branch
+
+jobs:
+  compare-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches all history so you can compare branches
+
+      - name: Fetch target branch
+        run: git fetch origin master # Change 'master' to the branch you want to compare against
+
+      - name: Compare file contents
+        run: |
+          echo "=== Showing differences against master branch ==="
+          
+          # Option 1: View the exact code diff for a specific file or folder
+          git diff origin/master...HEAD -- folder/file1.yml
+
+          # Option 2: List only the names of files that are different
+          git diff --name-status origin/master...HEAD
