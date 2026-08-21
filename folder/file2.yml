@@ -1,0 +1,12 @@
+logging:
+  level:
+    com:
+      cardinalhealth: DEBUG
+    reactor:
+      netty: TRACE
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-spec
+  packagesToScan: com.test.flow2
